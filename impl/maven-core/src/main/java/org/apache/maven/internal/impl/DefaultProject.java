@@ -43,20 +43,44 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.impl.MappedCollection;
 import org.apache.maven.impl.MappedList;
+import org.apache.maven.impl.MutableProject;
+import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.SourceQueries;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 
+import static java.util.Objects.requireNonNull;
+
 public class DefaultProject implements Project {
 
     private final InternalMavenSession session;
-    private final MavenProject project;
+    private final String groupId;
+    private final String artifactId;
+    private final String version;
     private final Packaging packaging;
+    private final List<org.eclipse.aether.artifact.Artifact> artifacts;
+    private final boolean producesMainArtifact;
+    private final Model model;
+    private final Path pomPath;
+    private final Path basedir;
+    private final Path rootDirectory;
+    private final Project parent;
+    private final List<Profile> effectiveProfiles;
+    private final List<Profile> declaredActiveProfiles;
+    private final List<Profile> effectiveActiveProfiles;
+    private final MutableProject mutableProject;
 
     public DefaultProject(InternalMavenSession session, MavenProject project) {
-        this.session = session;
-        this.project = project;
+        this(session, project, null);
+    }
+
+    private DefaultProject(InternalMavenSession session, MavenProject project, MutableProject mutableProject) {
+        this.session = requireNonNull(session, "session cannot be null");
+        requireNonNull(project, "project cannot be null");
+        this.groupId = project.getGroupId();
+        this.artifactId = project.getArtifactId();
+        this.version = project.getVersion();
         ClassLoader ttcl = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(project.getClassRealm());
@@ -64,53 +88,103 @@ public class DefaultProject implements Project {
         } finally {
             Thread.currentThread().setContextClassLoader(ttcl);
         }
+        this.producesMainArtifact = packaging != null
+                && packaging.producesMainArtifact()
+                && !SourceQueries.usesModuleSourceHierarchy(project);
+        ArrayList<org.eclipse.aether.artifact.Artifact> artifacts = new ArrayList<>(2);
+        if (hasCoordinates(project)) {
+            org.eclipse.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact(new ProjectArtifact(project));
+            artifacts.add(pomArtifact);
+            if (producesMainArtifact) {
+                Type type = packaging.type();
+                org.eclipse.aether.artifact.Artifact projectArtifact = project.getArtifact() != null
+                        ? RepositoryUtils.toArtifact(project.getArtifact())
+                        : new org.eclipse.aether.artifact.DefaultArtifact(
+                                groupId,
+                                artifactId,
+                                type.classifier() != null ? type.classifier() : "",
+                                type.extension(),
+                                version);
+                if (!ArtifactIdUtils.equalsVersionlessId(pomArtifact, projectArtifact)) {
+                    artifacts.add(projectArtifact);
+                }
+            }
+        }
+        this.artifacts = List.copyOf(artifacts);
+        this.model = project.getModel().getDelegate();
+        this.pomPath = project.getFile() != null ? project.getFile().toPath() : null;
+        this.basedir = project.getBasedir() != null ? project.getBasedir().toPath() : null;
+        this.rootDirectory = rootDirectory(project);
+        this.parent = session.getProject(project.getParent());
+        this.effectiveProfiles = Stream.iterate(project, Objects::nonNull, MavenProject::getParent)
+                .flatMap(current -> current.getModel().getDelegate().getProfiles().stream())
+                .toList();
+        this.declaredActiveProfiles = project.getActiveProfiles().stream()
+                .map(org.apache.maven.model.Profile::getDelegate)
+                .toList();
+        this.effectiveActiveProfiles = Stream.iterate(project, Objects::nonNull, MavenProject::getParent)
+                .flatMap(current -> current.getActiveProfiles().stream())
+                .map(org.apache.maven.model.Profile::getDelegate)
+                .toList();
+        this.mutableProject = mutableProject != null ? mutableProject : new MutableProject(this);
+    }
+
+    private static Path rootDirectory(MavenProject project) {
+        try {
+            return project.getRootDirectory();
+        } catch (IllegalStateException e) {
+            return null;
+        }
+    }
+
+    private static boolean hasCoordinates(MavenProject project) {
+        return project.getGroupId() != null
+                && !project.getGroupId().isEmpty()
+                && project.getArtifactId() != null
+                && !project.getArtifactId().isEmpty()
+                && project.getVersion() != null
+                && !project.getVersion().isEmpty();
     }
 
     public InternalMavenSession getSession() {
         return session;
     }
 
-    public MavenProject getProject() {
-        return project;
+    MutableProject mutableProject() {
+        return mutableProject;
+    }
+
+    DefaultProject newSnapshot(MavenProject project) {
+        return new DefaultProject(session, project, mutableProject);
     }
 
     @Nonnull
     @Override
     public String groupId() {
-        return project.getGroupId();
+        return groupId;
     }
 
     @Nonnull
     @Override
     public String artifactId() {
-        return project.getArtifactId();
+        return artifactId;
     }
 
     @Nonnull
     @Override
     public String version() {
-        return project.getVersion();
+        return version;
     }
 
     @Nonnull
     @Override
     public List<ProducedArtifact> artifacts() {
-        org.eclipse.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact(new ProjectArtifact(project));
-        org.eclipse.aether.artifact.Artifact projectArtifact = RepositoryUtils.toArtifact(project.getArtifact());
-
-        ArrayList<ProducedArtifact> result = new ArrayList<>(2);
-        result.add(session.getArtifact(ProducedArtifact.class, pomArtifact));
-        if (producesMainArtifact() && !ArtifactIdUtils.equalsVersionlessId(pomArtifact, projectArtifact)) {
-            result.add(session.getArtifact(ProducedArtifact.class, projectArtifact));
-        }
-        return Collections.unmodifiableList(result);
+        return new MappedList<>(artifacts, artifact -> session.getArtifact(ProducedArtifact.class, artifact));
     }
 
     @Override
     public boolean producesMainArtifact() {
-        return packaging != null
-                && packaging.producesMainArtifact()
-                && !SourceQueries.usesModuleSourceHierarchy(project);
+        return producesMainArtifact;
     }
 
     @Nonnull
@@ -122,21 +196,19 @@ public class DefaultProject implements Project {
     @Nonnull
     @Override
     public Model model() {
-        return project.getModel().getDelegate();
+        return model;
     }
 
     @Nonnull
     @Override
     public Path pomPath() {
-        return Objects.requireNonNull(project.getFile(), "pomPath cannot be null")
-                .toPath();
+        return Objects.requireNonNull(pomPath, "pomPath cannot be null");
     }
 
     @Nonnull
     @Override
     public Path basedir() {
-        return Objects.requireNonNull(project.getBasedir(), "basedir cannot be null")
-                .toPath();
+        return Objects.requireNonNull(basedir, "basedir cannot be null");
     }
 
     @Nonnull
@@ -167,13 +239,15 @@ public class DefaultProject implements Project {
 
     @Override
     public Path rootDirectory() {
-        return project.getRootDirectory();
+        if (rootDirectory == null) {
+            throw new IllegalStateException(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
+        }
+        return rootDirectory;
     }
 
     @Override
     public Optional<Project> parent() {
-        MavenProject parent = project.getParent();
-        return Optional.ofNullable(session.getProject(parent));
+        return Optional.ofNullable(parent);
     }
 
     @Override
@@ -185,26 +259,19 @@ public class DefaultProject implements Project {
     @Override
     @Nonnull
     public List<Profile> effectiveProfiles() {
-        return Stream.iterate(this.project, Objects::nonNull, MavenProject::getParent)
-                .flatMap(project -> project.getModel().getDelegate().getProfiles().stream())
-                .toList();
+        return effectiveProfiles;
     }
 
     @Override
     @Nonnull
     public List<Profile> declaredActiveProfiles() {
-        return project.getActiveProfiles().stream()
-                .map(org.apache.maven.model.Profile::getDelegate)
-                .toList();
+        return declaredActiveProfiles;
     }
 
     @Override
     @Nonnull
     public List<Profile> effectiveActiveProfiles() {
-        return Stream.iterate(this.project, Objects::nonNull, MavenProject::getParent)
-                .flatMap(project -> project.getActiveProfiles().stream())
-                .map(org.apache.maven.model.Profile::getDelegate)
-                .toList();
+        return effectiveActiveProfiles;
     }
 
     @Nonnull

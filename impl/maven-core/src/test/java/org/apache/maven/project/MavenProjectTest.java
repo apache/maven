@@ -40,6 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MavenProjectTest extends AbstractMavenProjectTestCase {
@@ -100,6 +102,60 @@ class MavenProjectTest extends AbstractMavenProjectTestCase {
                 MavenProject.EMPTY_PROJECT_GROUP_ID + ":" + MavenProject.EMPTY_PROJECT_ARTIFACT_ID + ":jar:"
                         + MavenProject.EMPTY_PROJECT_VERSION,
                 project.getId());
+    }
+
+    @Test
+    void detachedProjectExposesLiveModelAndProperties() {
+        MavenProject project = new MavenProject();
+
+        project.setGroupId("group");
+        project.setArtifactId("artifact");
+        project.getProperties().setProperty("key", "value");
+        project.getModel().setVersion("1.0");
+
+        assertEquals("group:artifact:jar:1.0", project.getId());
+        assertEquals("value", project.getModel().getProperties().getProperty("key"));
+    }
+
+    @Test
+    void copyAndClonePreserveCurrentRelationshipSemantics() {
+        MavenProject parent = new MavenProject();
+        MavenProject executionProject = new MavenProject();
+        MavenProject project = new MavenProject();
+        project.setParent(parent);
+        project.setExecutionProject(executionProject);
+
+        MavenProject copy = new MavenProject(project);
+        MavenProject clone = project.clone();
+
+        assertNull(copy.getParent());
+        assertSame(copy, copy.getExecutionProject());
+        assertSame(parent, clone.getParent());
+        assertSame(executionProject, clone.getExecutionProject());
+    }
+
+    @Test
+    void sameGavProjectsKeepIndependentMutableStateAndOrdering() {
+        MavenProject first = project("group", "artifact", "1.0");
+        MavenProject second = project("group", "artifact", "1.0");
+        first.setFile(Path.of("target", "first", "pom.xml").toAbsolutePath().toFile());
+        second.setFile(Path.of("target", "second", "pom.xml").toAbsolutePath().toFile());
+
+        first.getProperties().setProperty("owner", "first");
+        first.addCompileSourceRoot("src/first");
+        first.addCompileSourceRoot("src/second");
+        Artifact firstArtifact = new DefaultArtifact("group", "artifact", "1.0", "compile", "jar", "one", null);
+        Artifact secondArtifact = new DefaultArtifact("group", "artifact", "1.0", "compile", "jar", "two", null);
+        first.addAttachedArtifact(firstArtifact);
+        first.addAttachedArtifact(secondArtifact);
+
+        assertNotSame(first, second);
+        assertNull(second.getProperties().getProperty("owner"));
+        assertTrue(second.getSourceRoots().isEmpty());
+        assertTrue(second.getAttachedArtifacts().isEmpty());
+        assertEquals(List.of(firstArtifact, secondArtifact), first.getAttachedArtifacts());
+        assertTrue(first.getCompileSourceRoots().get(0).endsWith("src/first"));
+        assertTrue(first.getCompileSourceRoots().get(1).endsWith("src/second"));
     }
 
     @Test
@@ -291,5 +347,13 @@ class MavenProjectTest extends AbstractMavenProjectTestCase {
 
     private void assertNoNulls(List<String> elements) {
         assertFalse(elements.contains(null), "Expected " + elements + " to not contain " + null);
+    }
+
+    private static MavenProject project(String groupId, String artifactId, String version) {
+        MavenProject project = new MavenProject();
+        project.setGroupId(groupId);
+        project.setArtifactId(artifactId);
+        project.setVersion(version);
+        return project;
     }
 }

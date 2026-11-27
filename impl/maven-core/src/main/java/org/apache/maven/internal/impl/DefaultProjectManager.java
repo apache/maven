@@ -77,7 +77,7 @@ public class DefaultProjectManager implements ProjectManager {
     @Override
     public Optional<Path> getPath(@Nonnull Project project) {
         requireNonNull(project, "project" + " cannot be null");
-        Optional<ProducedArtifact> mainArtifact = project.getMainArtifact();
+        Optional<ProducedArtifact> mainArtifact = getCurrentProject(project).getMainArtifact();
         return mainArtifact.flatMap(artifactManager::getPath);
     }
 
@@ -96,7 +96,7 @@ public class DefaultProjectManager implements ProjectManager {
     public Collection<ProducedArtifact> getAllArtifacts(@Nonnull Project project) {
         requireNonNull(project, "project cannot be null");
         ArrayList<ProducedArtifact> result = new ArrayList<>(2);
-        result.addAll(project.getArtifacts());
+        result.addAll(getCurrentProject(project).getArtifacts());
         result.addAll(getAttachedArtifacts(project));
         return Collections.unmodifiableCollection(result);
     }
@@ -173,6 +173,7 @@ public class DefaultProjectManager implements ProjectManager {
         getMavenProject(project)
                 .addAttachedArtifact(
                         RepositoryUtils.toArtifact(getSession(project).toArtifact(artifact)));
+        session.updateProject(project);
         artifactManager.setPath(artifact, path);
     }
 
@@ -194,6 +195,7 @@ public class DefaultProjectManager implements ProjectManager {
     public void addSourceRoot(@Nonnull Project project, @Nonnull SourceRoot source) {
         MavenProject prj = getMavenProject(requireNonNull(project, "project" + " cannot be null"));
         prj.addSourceRoot(requireNonNull(source, "source" + " cannot be null"));
+        session.updateProject(project);
     }
 
     @Override
@@ -224,6 +226,7 @@ public class DefaultProjectManager implements ProjectManager {
                         && source.directory().equals(resolved));
         if (!exists) {
             prj.addSourceRoot(new DefaultSourceRoot(actualScope, actualLanguage, resolved, generated));
+            session.updateProject(project);
         }
     }
 
@@ -249,6 +252,7 @@ public class DefaultProjectManager implements ProjectManager {
         } else {
             properties.setProperty(key, value);
         }
+        session.updateProject(project);
     }
 
     @Override
@@ -261,15 +265,16 @@ public class DefaultProjectManager implements ProjectManager {
     @Override
     @Nonnull
     public Optional<Project> getExecutionProject(@Nonnull Project project) {
-        // Session keep tracks of the Project per project id,
-        // so we cannot use session.getProject(p) for forked projects
-        // which are temporary clones
         return Optional.ofNullable(getMavenProject(project).getExecutionProject())
-                .map(p -> new DefaultProject(session, p));
+                .map(session::getProject);
     }
 
     private MavenProject getMavenProject(Project project) {
-        return ((DefaultProject) project).getProject();
+        return requireNonNull(session.getMavenProject(project), "project is not associated with session");
+    }
+
+    private Project getCurrentProject(Project project) {
+        return ((DefaultProject) project).mutableProject().project();
     }
 
     private static InternalSession getSession(Project project) {

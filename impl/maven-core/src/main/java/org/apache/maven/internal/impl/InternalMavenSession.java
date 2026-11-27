@@ -47,6 +47,10 @@ public interface InternalMavenSession extends InternalSession {
     @Nullable
     Project getProject(org.apache.maven.project.MavenProject project);
 
+    org.apache.maven.project.MavenProject getMavenProject(Project project);
+
+    Project updateProject(Project project);
+
     List<org.apache.maven.artifact.repository.ArtifactRepository> toArtifactRepositories(
             List<RemoteRepository> repositories);
 

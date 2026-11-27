@@ -262,12 +262,21 @@ public class BootstrapCoreExtensionManager {
             super(session, repositorySystem, repositories, null, null, null, context);
         }
 
+        private SimpleSession(
+                MavenSession session,
+                RepositorySystem repositorySystem,
+                List<org.apache.maven.api.RemoteRepository> repositories,
+                RequestTrace context,
+                DefaultSession original) {
+            super(session, repositorySystem, repositories, null, null, null, context, original);
+        }
+
         @Override
         protected Session newSession(
                 MavenSession mavenSession,
                 List<org.apache.maven.api.RemoteRepository> repositories,
                 RequestTrace context) {
-            return new SimpleSession(mavenSession, getRepositorySystem(), repositories, context);
+            return new SimpleSession(mavenSession, getRepositorySystem(), repositories, context, this);
         }
 
         @Override

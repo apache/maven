@@ -23,9 +23,9 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.BuildInvocation;
@@ -46,6 +46,7 @@ import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.AbstractSession;
 import org.apache.maven.impl.DefaultRemoteRepository;
+import org.apache.maven.impl.MutableProject;
 import org.apache.maven.impl.PropertiesAsMap;
 import org.apache.maven.internal.build.DefaultBuildInvocation;
 import org.apache.maven.plugin.MojoExecution;
@@ -64,7 +65,7 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
     private final MavenSession mavenSession;
     private final MavenRepositorySystem mavenRepositorySystem;
     private final RuntimeInformation runtimeInformation;
-    private final Map<String, Project> allProjects = new ConcurrentHashMap<>();
+    private final ProjectRegistry projects;
     private final Object buildInvocationLock = new Object();
     private volatile BuildInvocation buildInvocation;
 
@@ -88,6 +89,48 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
             @Nonnull Lookup lookup,
             @Nonnull RuntimeInformation runtimeInformation,
             @Nullable RequestTrace context) {
+        this(
+                session,
+                repositorySystem,
+                remoteRepositories,
+                mavenRepositorySystem,
+                lookup,
+                runtimeInformation,
+                context,
+                new ProjectRegistry());
+    }
+
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    protected DefaultSession(
+            @Nonnull MavenSession session,
+            @Nonnull RepositorySystem repositorySystem,
+            @Nullable List<RemoteRepository> remoteRepositories,
+            @Nonnull MavenRepositorySystem mavenRepositorySystem,
+            @Nonnull Lookup lookup,
+            @Nonnull RuntimeInformation runtimeInformation,
+            @Nullable RequestTrace context,
+            @Nonnull DefaultSession original) {
+        this(
+                session,
+                repositorySystem,
+                remoteRepositories,
+                mavenRepositorySystem,
+                lookup,
+                runtimeInformation,
+                context,
+                original.projects);
+    }
+
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    private DefaultSession(
+            @Nonnull MavenSession session,
+            @Nonnull RepositorySystem repositorySystem,
+            @Nullable List<RemoteRepository> remoteRepositories,
+            @Nonnull MavenRepositorySystem mavenRepositorySystem,
+            @Nonnull Lookup lookup,
+            @Nonnull RuntimeInformation runtimeInformation,
+            @Nullable RequestTrace context,
+            @Nonnull ProjectRegistry projects) {
         super(
                 requireNonNull(session).getRepositorySession(),
                 repositorySystem,
@@ -100,6 +143,7 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
         this.mavenSession = session;
         this.mavenRepositorySystem = mavenRepositorySystem;
         this.runtimeInformation = runtimeInformation;
+        this.projects = projects;
     }
 
     @Override
@@ -117,9 +161,35 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
 
     @Override
     public Project getProject(MavenProject project) {
-        return project != null && project.getBasedir() != null
-                ? allProjects.computeIfAbsent(project.getId(), id -> new DefaultProject(this, project))
-                : null;
+        if (project == null || project.getBasedir() == null) {
+            return null;
+        }
+        synchronized (projects) {
+            MutableProject mutableProject = projects.allProjects.get(project);
+            if (mutableProject == null) {
+                DefaultProject snapshot = new DefaultProject(this, project);
+                mutableProject = snapshot.mutableProject();
+                projects.allProjects.put(project, mutableProject);
+                projects.legacyProjects.put(mutableProject, project);
+            }
+            return mutableProject.project();
+        }
+    }
+
+    @Override
+    public MavenProject getMavenProject(Project project) {
+        synchronized (projects) {
+            return requireNonNull(
+                    projects.legacyProjects.get(((DefaultProject) project).mutableProject()),
+                    "project is not associated with session");
+        }
+    }
+
+    @Override
+    public Project updateProject(Project project) {
+        DefaultProject snapshot = (DefaultProject) project;
+        MavenProject mavenProject = getMavenProject(project);
+        return snapshot.mutableProject().update(current -> ((DefaultProject) current).newSnapshot(mavenProject));
     }
 
     @Override
@@ -214,7 +284,7 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
             MojoExecution mojoExecution = lookup.lookup(MojoExecution.class);
             MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
             PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-            return getMavenSession().getPluginContext(pluginDescriptor, ((DefaultProject) project).getProject());
+            return getMavenSession().getPluginContext(pluginDescriptor, getMavenProject(project));
         } catch (LookupException e) {
             throw new MavenException("The PluginContext is only available during a mojo execution", e);
         }
@@ -242,7 +312,13 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
                 mavenRepositorySystem,
                 lookup,
                 runtimeInformation,
-                context);
+                context,
+                projects);
+    }
+
+    private static final class ProjectRegistry {
+        private final Map<MavenProject, MutableProject> allProjects = new IdentityHashMap<>();
+        private final Map<MutableProject, MavenProject> legacyProjects = new IdentityHashMap<>();
     }
 
     @Override
