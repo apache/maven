@@ -52,22 +52,12 @@ public class DefaultVersionResolver implements VersionResolver {
     public VersionResolverResult resolve(VersionResolverRequest request) throws VersionResolverException {
         requireNonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
-        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
-        try {
-            return session.request(request, this::doResolve);
-        } finally {
-            RequestTraceHelper.exit(trace);
-        }
+        return session.request(request, this::doResolve);
     }
 
     protected VersionResolverResult doResolve(VersionResolverRequest request) throws VersionResolverException {
         InternalSession session = InternalSession.from(request.getSession());
-        org.apache.maven.api.services.RequestTrace trace = RequestTraceHelper.getCurrentTrace(session);
-        RequestTraceHelper.ResolverTrace fallbackTrace = null;
-        if (trace == null) {
-            fallbackTrace = RequestTraceHelper.enter(session, request);
-            trace = fallbackTrace.mvnTrace();
-        }
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
         try {
             VersionRequest req = new VersionRequest(
                             session.toArtifact(request.getArtifactCoordinates()),
@@ -76,7 +66,7 @@ public class DefaultVersionResolver implements VersionResolver {
                                             ? request.getRepositories()
                                             : session.getRemoteRepositories()),
                             trace.context())
-                    .setTrace(RequestTraceHelper.toResolver(trace));
+                    .setTrace(trace.trace());
             VersionResult res = repositorySystem.resolveVersion(session.getSession(), req);
 
             return new VersionResolverResult() {
@@ -110,9 +100,7 @@ public class DefaultVersionResolver implements VersionResolver {
         } catch (VersionResolutionException e) {
             throw new VersionResolverException("Unable to resolve version", e);
         } finally {
-            if (fallbackTrace != null) {
-                RequestTraceHelper.exit(fallbackTrace);
-            }
+            RequestTraceHelper.exit(trace);
         }
     }
 }
