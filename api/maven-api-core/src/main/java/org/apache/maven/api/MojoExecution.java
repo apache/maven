@@ -132,7 +132,7 @@ public interface MojoExecution {
     /**
      * {@return true if this mojo triggers a forked lifecycle execution}
      *
-     * @since 4.2.0
+     * @since 4.0.0
      */
     default boolean isForkingExecution() {
         MojoDescriptor d = descriptor();
