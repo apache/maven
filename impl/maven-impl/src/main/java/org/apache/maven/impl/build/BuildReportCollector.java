@@ -239,7 +239,10 @@ public final class BuildReportCollector implements ExecutionListener, LogSink, S
             this.buildInvocation = DefaultBuildInvocation.from(session);
         }
         if (!includePii && this.buildInvocation instanceof DefaultBuildInvocation inv) {
-            // Strip potentially sensitive system properties from the report unless opted in
+            // Strip potentially sensitive system properties from the report unless opted in.
+            // Note: this guard only applies when session.buildInvocation() returns a
+            // DefaultBuildInvocation (the standard runtime). Embedders that supply a custom
+            // BuildInvocation implementation are responsible for filtering PII themselves.
             Map<String, String> filtered = new java.util.TreeMap<>(inv.systemInfo());
             filtered.remove("user.home");
             filtered.remove("user.name");

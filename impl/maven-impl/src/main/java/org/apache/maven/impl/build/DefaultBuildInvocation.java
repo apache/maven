@@ -131,7 +131,7 @@ public record DefaultBuildInvocation(
                 session.getDegreeOfConcurrency());
     }
 
-    static boolean isSensitiveKey(String key) {
+    public static boolean isSensitiveKey(String key) {
         String lower = key.toLowerCase(Locale.ROOT);
         for (String fragment : SENSITIVE_KEY_FRAGMENTS) {
             if (lower.contains(fragment)) {
