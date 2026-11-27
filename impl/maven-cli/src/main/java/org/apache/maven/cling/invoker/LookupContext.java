@@ -38,6 +38,7 @@ import org.apache.maven.api.settings.Settings;
 import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.logging.BuildEventListener;
+import org.apache.maven.logging.ProjectBuildLogAppender;
 import org.jline.terminal.Terminal;
 import org.slf4j.ILoggerFactory;
 
@@ -89,6 +90,7 @@ public class LookupContext implements AutoCloseable {
     public boolean loggingActivated = false;
     public Boolean coloredOutput;
     public Terminal terminal;
+    public ProjectBuildLogAppender projectBuildLogAppender;
     public Consumer<String> writer;
 
     public ContainerCapsule containerCapsule;

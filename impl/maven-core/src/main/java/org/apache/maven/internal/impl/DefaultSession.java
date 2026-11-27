@@ -23,13 +23,17 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.BuildInvocation;
+import org.apache.maven.api.MakeBehavior;
 import org.apache.maven.api.Project;
+import org.apache.maven.api.ReactorFailureBehavior;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Version;
@@ -47,7 +51,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.AbstractSession;
 import org.apache.maven.impl.DefaultRemoteRepository;
 import org.apache.maven.impl.PropertiesAsMap;
-import org.apache.maven.internal.build.DefaultBuildInvocation;
+import org.apache.maven.impl.build.DefaultBuildInvocation;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -177,11 +181,89 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
         if (buildInvocation == null) {
             synchronized (buildInvocationLock) {
                 if (buildInvocation == null) {
-                    buildInvocation = DefaultBuildInvocation.from(getMavenSession());
+                    buildInvocation = buildInvocationFromRequest();
                 }
             }
         }
         return buildInvocation;
+    }
+
+    private BuildInvocation buildInvocationFromRequest() {
+        var request = getMavenSession().getRequest();
+
+        List<String> goals = request.getGoals() != null ? List.copyOf(request.getGoals()) : List.of();
+
+        Map<String, String> userProps = new LinkedHashMap<>();
+        if (request.getUserProperties() != null) {
+            request.getUserProperties().forEach((k, v) -> {
+                String key = String.valueOf(k);
+                String value = DefaultBuildInvocation.isSensitiveKey(key) ? "***" : String.valueOf(v);
+                userProps.put(key, value);
+            });
+        }
+
+        Map<String, String> sysInfo = new TreeMap<>();
+        addSystemProp(sysInfo, "os.name");
+        addSystemProp(sysInfo, "os.arch");
+        addSystemProp(sysInfo, "os.version");
+        addSystemProp(sysInfo, "java.vendor");
+        addSystemProp(sysInfo, "java.vm.name");
+        addSystemProp(sysInfo, "java.vm.version");
+        addSystemProp(sysInfo, "maven.home");
+        addSystemProp(sysInfo, "user.home");
+        addSystemProp(sysInfo, "user.name");
+        sysInfo.put("available.processors", String.valueOf(Runtime.getRuntime().availableProcessors()));
+
+        List<String> activeProfiles =
+                request.getActiveProfiles() != null ? List.copyOf(request.getActiveProfiles()) : List.of();
+
+        List<String> selectedProjects =
+                request.getSelectedProjects() != null ? List.copyOf(request.getSelectedProjects()) : List.of();
+
+        List<String> excludedProjects =
+                request.getExcludedProjects() != null ? List.copyOf(request.getExcludedProjects()) : List.of();
+
+        MakeBehavior makeBehavior = null;
+        if (request.getMakeBehavior() != null) {
+            try {
+                makeBehavior = MakeBehavior.fromString(request.getMakeBehavior());
+            } catch (IllegalArgumentException e) {
+                // unknown make behavior: ignore
+            }
+        }
+
+        ReactorFailureBehavior failureBehavior = ReactorFailureBehavior.FAIL_FAST;
+        if (request.getReactorFailureBehavior() != null) {
+            try {
+                failureBehavior = ReactorFailureBehavior.fromString(request.getReactorFailureBehavior());
+            } catch (IllegalArgumentException e) {
+                // unknown failure behavior: default to FAIL_FAST
+            }
+        }
+
+        return new DefaultBuildInvocation(
+                goals,
+                Map.copyOf(userProps),
+                Map.copyOf(sysInfo),
+                activeProfiles,
+                selectedProjects,
+                excludedProjects,
+                makeBehavior,
+                request.getResumeFrom(),
+                failureBehavior,
+                request.isOffline(),
+                request.isUpdateSnapshots(),
+                !request.isInteractiveMode(),
+                request.isRecursive(),
+                request.isResume(),
+                request.getDegreeOfConcurrency());
+    }
+
+    private static void addSystemProp(Map<String, String> map, String key) {
+        String value = System.getProperty(key);
+        if (value != null) {
+            map.put(key, value);
+        }
     }
 
     @Nonnull

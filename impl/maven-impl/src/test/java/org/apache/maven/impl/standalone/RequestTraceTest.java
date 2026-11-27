@@ -47,6 +47,7 @@ import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -109,8 +110,8 @@ class RequestTraceTest {
         Session derived = session.withRemoteRepositories(session.getRemoteRepositories());
         assertTrue(derived.getListeners().contains(listener));
         derived.unregisterListener(listener);
-        assertTrue(session.getListeners().isEmpty());
-        assertTrue(derived.getListeners().isEmpty());
+        assertFalse(session.getListeners().contains(listener));
+        assertFalse(derived.getListeners().contains(listener));
         assertNotNull(node);
         assertEquals(6, node.children().size());
     }

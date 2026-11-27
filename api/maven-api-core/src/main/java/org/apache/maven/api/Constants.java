@@ -918,6 +918,60 @@ public final class Constants {
     @Config
     public static final String MAVEN_LIFECYCLE_FILTER = "maven.lifecycle.filter";
 
+    // ---- Build report ----
+
+    /**
+     * Whether the structured build report is written at the end of each build.
+     * When set to {@code false}, no JSON report is produced. Defaults to {@code true}.
+     *
+     * @since 4.2.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "true")
+    public static final String MAVEN_BUILD_REPORT_ENABLED = "maven.buildReport.enabled";
+
+    /**
+     * Whether to include potentially sensitive system properties ({@code user.home}, {@code user.name})
+     * in the build report's {@code systemInfo} section. Defaults to {@code false}.
+     * Set to {@code true} to include these properties for diagnostics.
+     *
+     * @since 4.2.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_BUILD_REPORT_INCLUDE_PII = "maven.buildReport.includePii";
+
+    /**
+     * Maximum number of log events captured per scope (mojo, subproject, or build-level) in the
+     * structured build report written to {@code target/build-reports/build-report-latest.json}.
+     * Each of the three scopes is capped independently: once a buffer reaches this limit, further
+     * events for that scope are silently dropped to prevent unbounded memory growth on verbose builds.
+     *
+     * @since 4.2.0
+     */
+    @Config(type = "java.lang.Integer", defaultValue = "500")
+    public static final String MAVEN_BUILD_REPORT_MAX_LOG_EVENTS = "maven.buildReport.maxLogEvents";
+
+    /**
+     * Maximum number of stack-trace lines retained per failure entry in the structured build report.
+     * When a build failure's exception stack trace exceeds this limit, the excess lines are replaced
+     * by a {@code "... N more lines truncated"} notice. The cap applies to each
+     * {@link org.apache.maven.api.build.report.FailureReport#stackTrace()} entry independently.
+     *
+     * @since 4.2.0
+     */
+    @Config(type = "java.lang.Integer", defaultValue = "30")
+    public static final String MAVEN_BUILD_REPORT_MAX_STACKTRACE_LINES = "maven.buildReport.maxStacktraceLines";
+
+    /**
+     * Maximum number of throwable lines serialised per log event in the structured build report.
+     * When a {@link org.apache.maven.api.logging.LogEvent} carries a throwable whose printed form
+     * exceeds this limit, the excess lines are replaced by a {@code "... N more lines truncated"} notice.
+     * The cap applies to each log event's throwable independently.
+     *
+     * @since 4.2.0
+     */
+    @Config(type = "java.lang.Integer", defaultValue = "200")
+    public static final String MAVEN_BUILD_REPORT_MAX_THROWABLE_LINES = "maven.buildReport.maxThrowableLines";
+
     /**
      * System property to disable the {@code site} lifecycle.
      * When set to {@code true} via {@code -Dmaven.site.lifecycle.disabled=true}, the {@code site}

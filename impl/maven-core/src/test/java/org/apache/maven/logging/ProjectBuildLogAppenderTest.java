@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Tests for {@link ProjectBuildLogAppender}: ThreadLocal enrichment, no-copy fast path,
- * and reportCapture forwarding.
+ * and secondary sink forwarding.
  */
 class ProjectBuildLogAppenderTest {
 
@@ -54,7 +54,6 @@ class ProjectBuildLogAppenderTest {
         };
         ProjectBuildLogAppender.setProjectId(null);
         ProjectBuildLogAppender.setMojoId(null);
-        ProjectBuildLogAppender.setReportCapture(null);
     }
 
     @AfterEach
@@ -62,7 +61,6 @@ class ProjectBuildLogAppenderTest {
         LoggerManager.set(null);
         ProjectBuildLogAppender.setProjectId(null);
         ProjectBuildLogAppender.setMojoId(null);
-        ProjectBuildLogAppender.setReportCapture(null);
     }
 
     /**
@@ -125,22 +123,22 @@ class ProjectBuildLogAppenderTest {
     }
 
     /**
-     * {@code reportCapture} must receive a copy of every forwarded event.
+     * Secondary sinks must receive a copy of every forwarded event.
      */
     @Test
-    void reportCaptureReceivesForwardedEvent() throws Exception {
+    void secondarySinkReceivesForwardedEvent() throws Exception {
         List<LogEvent> captured = new ArrayList<>();
-        ProjectBuildLogAppender.setReportCapture(captured::add);
         ProjectBuildLogAppender.setProjectId("proj");
 
         DefaultLogEvent raw = new DefaultLogEvent(null, LogLevel.DEBUG, "debug msg", "org.example.Baz", null);
 
         try (ProjectBuildLogAppender appender = new ProjectBuildLogAppender(listener)) {
+            appender.setSpiSinks(List.of(captured::add));
             LoggerManager.get().getLogSink().accept(raw);
         }
 
         assertEquals(1, received.size(), "listener must receive the event");
-        assertEquals(1, captured.size(), "reportCapture must also receive the event");
+        assertEquals(1, captured.size(), "secondary sink must also receive the event");
         assertEquals("proj", captured.get(0).projectId(), "captured event must carry enriched projectId");
     }
 

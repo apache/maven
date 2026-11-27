@@ -32,9 +32,9 @@ import org.apache.maven.api.services.RequestTrace;
  * - "ParentType *" matches any request with ParentType as parent
  * - "* RequestType" matches RequestType with any parent (equivalent to just "RequestType")
  *
- * @param parentRequestType
- * @param requestType
- * @param config
+ * @param parentRequestType optional parent request type to match against, or {@code null} to match any parent
+ * @param requestType the request type to match; use {@code "*"} to match any type
+ * @param config the partial cache configuration to apply when this selector matches
  */
 public record CacheSelector(String parentRequestType, String requestType, PartialCacheConfig config) {
 
