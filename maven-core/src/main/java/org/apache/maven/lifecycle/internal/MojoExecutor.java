@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -378,7 +379,8 @@ public class MojoExecutor {
                 || (artifact.getClassifier() != null
                         && !artifact.getClassifier().isEmpty())
                 || artifact.getFile().equals(project.getFile())
-                || artifact.getFile().equals(artifactFileBefore)) {
+                || artifact.getFile().equals(artifactFileBefore)
+                || isPomFileName(artifact.getFile())) {
             return null;
         }
         return "Plugin " + mojoExecution.getPlugin().getId() + ":" + mojoExecution.getGoal() + " set the file of "
@@ -386,6 +388,12 @@ public class MojoExecutor {
                 + artifact.getFile() + ", but that artifact is the project's POM (" + project.getFile()
                 + "). Install and deploy may publish this file in place of the POM;"
                 + " attach it with a classifier instead.";
+    }
+
+    /** A flattened or generated POM is a legitimate replacement for the project POM. */
+    private static boolean isPomFileName(File file) {
+        String name = file.getName().toLowerCase(Locale.ROOT);
+        return name.endsWith(".pom") || name.endsWith(".xml");
     }
 
     public void ensureDependenciesAreResolved(
