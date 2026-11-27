@@ -44,8 +44,12 @@ public class MessageUtils {
     static Thread shutdownHook;
     static final Object STARTUP_SHUTDOWN_MONITOR = new Object();
 
+    public static void systemInstall(Terminal terminal) {
+        MessageUtils.terminal = terminal;
+    }
+
     public static void systemInstall() {
-        systemInstall(null);
+        systemInstall((Consumer<TerminalBuilder>) null);
     }
 
     public static void systemInstall(Consumer<TerminalBuilder> builderConsumer) {
