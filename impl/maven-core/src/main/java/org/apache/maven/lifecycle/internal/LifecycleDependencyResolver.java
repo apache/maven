@@ -102,6 +102,20 @@ public class LifecycleDependencyResolver {
         }
     }
 
+    /**
+     * Makes sure {@link MavenProject#getDependencyArtifacts()} holds the (unresolved) artifacts of the project's
+     * direct dependencies, so that mojos which declare no dependency resolution can still read them.
+     */
+    public void ensureDependencyArtifacts(MavenProject project) throws LifecycleExecutionException {
+        if (project.getDependencyArtifacts() == null) {
+            try {
+                project.setDependencyArtifacts(artifactFactory.createArtifacts(project));
+            } catch (InvalidDependencyVersionException e) {
+                throw new LifecycleExecutionException(e);
+            }
+        }
+    }
+
     public void resolveProjectDependencies(
             MavenProject project,
             Collection<String> scopesToCollect,
@@ -117,13 +131,7 @@ public class LifecycleDependencyResolver {
                 Thread.currentThread().setContextClassLoader(projectRealm);
             }
 
-            if (project.getDependencyArtifacts() == null) {
-                try {
-                    project.setDependencyArtifacts(artifactFactory.createArtifacts(project));
-                } catch (InvalidDependencyVersionException e) {
-                    throw new LifecycleExecutionException(e);
-                }
-            }
+            ensureDependencyArtifacts(project);
 
             Set<Artifact> resolvedArtifacts = resolveProjectArtifacts(
                     project, scopesToCollect, scopesToResolve, session, aggregating, projectArtifacts);

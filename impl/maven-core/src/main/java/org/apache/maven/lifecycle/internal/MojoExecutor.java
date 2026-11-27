@@ -428,6 +428,9 @@ public class MojoExecutor {
                     project, scopesToCollect, scopesToResolve, session, aggregating, Collections.emptySet());
 
             dependencyContext.synchronizeWithProjectState();
+        } else {
+            // Mojos without a resolution scope still expect the direct dependency artifacts (unresolved)
+            lifeCycleDependencyResolver.ensureDependencyArtifacts(project);
         }
 
         if (aggregating) {

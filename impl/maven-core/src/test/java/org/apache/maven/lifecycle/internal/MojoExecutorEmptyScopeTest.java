@@ -40,8 +40,8 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -110,7 +110,7 @@ class MojoExecutorEmptyScopeTest {
                 new DependencyContext(project, Collections.emptyList(), Collections.emptyList());
         executor.ensureDependenciesAreResolved(mojo(null), session, noScopeStep);
 
-        verifyNoInteractions(resolver);
+        verify(resolver, never()).resolveProjectDependencies(any(), any(), any(), any(), anyBoolean(), any());
         assertEquals(0, project.getArtifacts().size(), "the no-scope mojo must still see no artifacts");
 
         // A later mojo of the original step must still see the artifacts resolved for that step.
