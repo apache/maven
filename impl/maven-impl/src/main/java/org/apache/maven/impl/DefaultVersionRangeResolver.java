@@ -84,7 +84,7 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
 
             return new VersionRangeResolverResult() {
                 @Override
-                public VersionRangeResolverRequest getRequest() {
+                public VersionRangeResolverRequest request() {
                     return request;
                 }
 

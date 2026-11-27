@@ -42,7 +42,7 @@ public class TravisCIDetector implements CIDetector {
                 }
 
                 @Override
-                public boolean isVerbose() {
+                public boolean verbose() {
                     return "true".equals(System.getenv(TRAVIS_DEBUG_MODE));
                 }
             });

@@ -83,14 +83,14 @@ class DefaultTypeProviderTest {
 
             DefaultType type = types.get(typeId);
             assertNotNull(type, "Type not found in provider: " + typeId);
-            assertEquals(extension, type.getExtension(), typeId + " extension");
-            assertEquals(classifier, type.getClassifier(), typeId + " classifier");
-            assertEquals(language, type.getLanguage().id(), typeId + " language");
+            assertEquals(extension, type.extension(), typeId + " extension");
+            assertEquals(classifier, type.classifier(), typeId + " classifier");
+            assertEquals(language, type.language().id(), typeId + " language");
             assertEquals(
-                    type.isIncludesDependencies() ? "true" : null,
+                    type.includesDependencies() ? "true" : null,
                     includesDependencies,
                     typeId + " includesDependencies");
-            assertEquals(parsePathTypes(pathTypesStr), type.getPathTypes(), typeId + " pathTypes");
+            assertEquals(parsePathTypes(pathTypesStr), type.pathTypes(), typeId + " pathTypes");
         }
 
         Set<String> undocumented = new LinkedHashSet<>(types.keySet());

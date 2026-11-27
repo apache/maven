@@ -40,19 +40,37 @@ public class DefaultLocalRepository implements LocalRepository {
 
     @Nonnull
     @Override
-    public String getId() {
+    public String id() {
         return repository.getId();
     }
 
     @Nonnull
     @Override
-    public String getType() {
+    public String getId() {
+        return id();
+    }
+
+    @Nonnull
+    @Override
+    public String type() {
         return repository.getContentType();
     }
 
     @Nonnull
     @Override
-    public Path getPath() {
+    public String getType() {
+        return type();
+    }
+
+    @Nonnull
+    @Override
+    public Path path() {
         return repository.getBasePath();
+    }
+
+    @Nonnull
+    @Override
+    public Path getPath() {
+        return path();
     }
 }

@@ -46,12 +46,12 @@ abstract class BaseRequest<S extends ProtoSession> implements Request<S> {
 
     @Nonnull
     @Override
-    public S getSession() {
+    public S session() {
         return session;
     }
 
     @Override
-    public RequestTrace getTrace() {
+    public RequestTrace trace() {
         return trace;
     }
 }

@@ -24,7 +24,6 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.model.Dependency;
 
 /**
  * A dependency's {@code Type} is uniquely identified by a {@code String},
@@ -143,7 +142,17 @@ public interface Type extends ExtensibleEnum {
      * @return the language of this type, never {@code null}.
      */
     @Nonnull
-    Language getLanguage();
+    Language language();
+
+    /**
+     * @return the language of this type, never {@code null}.
+     * @deprecated Use {@link #language()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default Language getLanguage() {
+        return language();
+    }
 
     /**
      * Get the file extension of artifacts of this type.
@@ -151,26 +160,53 @@ public interface Type extends ExtensibleEnum {
      * @return the file extension, never {@code null}.
      */
     @Nonnull
-    String getExtension();
+    String extension();
+
+    /**
+     * @return the file extension, never {@code null}.
+     * @deprecated Use {@link #extension()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default String getExtension() {
+        return extension();
+    }
 
     /**
      * Get the default classifier associated to the dependency type.
      * The default classifier can be overridden when specifying
-     * the {@link Dependency#getClassifier()}.
+     * the {@link Dependency#classifier()}.
      *
      * @return the default classifier, or {@code null}.
      */
     @Nullable
-    String getClassifier();
+    String classifier();
+
+    /**
+     * @return the default classifier, or {@code null}.
+     * @deprecated Use {@link #classifier()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default String getClassifier() {
+        return classifier();
+    }
 
     /**
      * Specifies if the artifact already embeds its own dependencies.
-     * This is the case for JEE packages or similar artifacts such as
-     * WARs, EARs, etc.
      *
      * @return if the artifact's dependencies are included in the artifact
      */
-    boolean isIncludesDependencies();
+    boolean includesDependencies();
+
+    /**
+     * @return if the artifact's dependencies are included in the artifact
+     * @deprecated Use {@link #includesDependencies()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default boolean isIncludesDependencies() {
+        return includesDependencies();
+    }
 
     /**
      * Types of path (class-path, module-path, …) where the dependency can be placed.
@@ -183,7 +219,19 @@ public interface Type extends ExtensibleEnum {
      * and the user may have provided no instruction about which type to use. In such
      * case, the plugin may apply rules for choosing a path. See for example
      * {@link JavaPathType#CLASSES} and {@link JavaPathType#MODULES}.</p>
+     *
+     * @return the path types, never {@code null}
      */
     @Nonnull
-    Set<PathType> getPathTypes();
+    Set<PathType> pathTypes();
+
+    /**
+     * @return the path types
+     * @deprecated Use {@link #pathTypes()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default Set<PathType> getPathTypes() {
+        return pathTypes();
+    }
 }

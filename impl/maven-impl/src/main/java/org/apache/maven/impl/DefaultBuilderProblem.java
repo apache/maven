@@ -44,37 +44,37 @@ class DefaultBuilderProblem implements BuilderProblem {
     }
 
     @Override
-    public String getSource() {
+    public String source() {
         return source;
     }
 
     @Override
-    public int getLineNumber() {
+    public int lineNumber() {
         return lineNumber;
     }
 
     @Override
-    public int getColumnNumber() {
+    public int columnNumber() {
         return columnNumber;
     }
 
     @Override
-    public Exception getException() {
+    public Exception exception() {
         return exception;
     }
 
     @Override
-    public String getMessage() {
+    public String message() {
         return message;
     }
 
     @Override
-    public Severity getSeverity() {
+    public Severity severity() {
         return severity;
     }
 
     @Override
-    public String getLocation() {
+    public String location() {
         StringBuilder buffer = new StringBuilder(256);
         if (getSource() != null && !getSource().isEmpty()) {
             buffer.append(getSource());

@@ -52,51 +52,62 @@ public interface ProjectBuilderRequest extends RepositoryAwareRequest {
      * @return an optional containing the path to the project, or empty if not specified
      */
     @Nonnull
-    Optional<Path> getPath();
+    Optional<Path> path();
 
     /**
-     * Gets the source of the project to build.
-     * This is an alternative to specifying a path, allowing the project to be built from
-     * a model source such as a string or input stream.
-     *
-     * @return an optional containing the source of the project, or empty if not specified
+     * @deprecated Use {@link #path()} instead.
      */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
-    Optional<Source> getSource();
+    default Optional<Path> getPath() {
+        return path();
+    }
+
+    @Nonnull
+    Optional<Source> source();
 
     /**
-     * Determines whether a stub model should be allowed when the POM is missing or unreadable.
-     * A stub model contains only minimal information derived from the project's coordinates.
-     *
-     * @return true if a stub model should be allowed, false otherwise
+     * @deprecated Use {@link #source()} instead.
      */
-    boolean isAllowStubModel();
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default Optional<Source> getSource() {
+        return source();
+    }
+
+    boolean allowStubModel();
 
     /**
-     * Determines whether the project builder should recursively build parent/child projects.
-     * When true, the builder will process parent POMs and child modules as needed.
-     *
-     * @return true if the build should be recursive, false otherwise
+     * @deprecated Use {@link #allowStubModel()} instead.
      */
-    boolean isRecursive();
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default boolean isAllowStubModel() {
+        return allowStubModel();
+    }
+
+    boolean recursive();
 
     /**
-     * Determines whether plugins should be processed during project building.
-     * When true, the builder will process plugin information which may include
-     * resolving plugin dependencies and executing plugin goals that participate in project building.
-     *
-     * @return true if plugins should be processed, false otherwise
+     * @deprecated Use {@link #recursive()} instead.
      */
-    boolean isProcessPlugins();
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default boolean isRecursive() {
+        return recursive();
+    }
+
+    boolean processPlugins();
 
     /**
-     * Gets the list of remote repositories to use for resolving dependencies during project building.
-     * These repositories will be used in addition to any repositories defined in the project itself.
-     *
-     * @return the list of remote repositories, or null if not specified
+     * @deprecated Use {@link #processPlugins()} instead.
      */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default boolean isProcessPlugins() {
+        return processPlugins();
+    }
+
     @Nullable
-    List<RemoteRepository> getRepositories();
+    @Override
+    List<RemoteRepository> repositories();
 
     /**
      * Creates a new ProjectBuilderRequest with the specified session and source.
@@ -270,33 +281,33 @@ public interface ProjectBuilderRequest extends RepositoryAwareRequest {
 
             @Nonnull
             @Override
-            public Optional<Path> getPath() {
+            public Optional<Path> path() {
                 return Optional.ofNullable(path);
             }
 
             @Nonnull
             @Override
-            public Optional<Source> getSource() {
+            public Optional<Source> source() {
                 return Optional.ofNullable(source);
             }
 
             @Override
-            public boolean isAllowStubModel() {
+            public boolean allowStubModel() {
                 return allowStubModel;
             }
 
             @Override
-            public boolean isRecursive() {
+            public boolean recursive() {
                 return recursive;
             }
 
             @Override
-            public boolean isProcessPlugins() {
+            public boolean processPlugins() {
                 return processPlugins;
             }
 
             @Override
-            public List<RemoteRepository> getRepositories() {
+            public List<RemoteRepository> repositories() {
                 return repositories;
             }
 

@@ -22,6 +22,7 @@ import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.PluginExecution;
 import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.api.xml.XmlNode;
@@ -37,24 +38,105 @@ import org.apache.maven.api.xml.XmlNode;
 @Experimental
 public interface MojoExecution {
 
+    /** {@return the plugin that owns this execution} */
     @Nonnull
-    Plugin getPlugin();
+    Plugin plugin();
 
+    /**
+     * @deprecated Use {@link #plugin()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
-    PluginExecution getModel();
+    default Plugin getPlugin() {
+        return plugin();
+    }
 
+    /** {@return the execution model element, if any} */
     @Nonnull
-    MojoDescriptor getDescriptor();
+    Optional<PluginExecution> model();
 
-    @Nonnull
-    String getExecutionId();
+    /**
+     * @deprecated Use {@link #model()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default PluginExecution getModel() {
+        return model().orElse(null);
+    }
 
+    /** {@return the descriptor of the mojo being executed} */
     @Nonnull
-    String getGoal();
+    MojoDescriptor descriptor();
 
+    /**
+     * @deprecated Use {@link #descriptor()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
-    String getLifecyclePhase();
+    default MojoDescriptor getDescriptor() {
+        return descriptor();
+    }
 
+    /** {@return the execution identifier, or empty for a direct CLI invocation} */
     @Nonnull
-    Optional<XmlNode> getConfiguration();
+    Optional<String> executionId();
+
+    /**
+     * @deprecated Use {@link #executionId()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default String getExecutionId() {
+        return executionId().orElse(null);
+    }
+
+    /** {@return the goal being executed} */
+    @Nonnull
+    String goal();
+
+    /**
+     * @deprecated Use {@link #goal()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default String getGoal() {
+        return goal();
+    }
+
+    /** {@return the lifecycle phase this execution is bound to, or empty for a direct CLI invocation} */
+    @Nonnull
+    Optional<String> lifecyclePhase();
+
+    /**
+     * @deprecated Use {@link #lifecyclePhase()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default String getLifecyclePhase() {
+        return lifecyclePhase().orElse(null);
+    }
+
+    /** {@return the merged configuration for this execution, if any} */
+    @Nonnull
+    Optional<XmlNode> configuration();
+
+    /**
+     * @deprecated Use {@link #configuration()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default Optional<XmlNode> getConfiguration() {
+        return configuration();
+    }
+
+    /**
+     * {@return true if this mojo triggers a forked lifecycle execution}
+     *
+     * @since 4.0.0
+     */
+    default boolean isForkingExecution() {
+        MojoDescriptor d = descriptor();
+        return (d.getExecutePhase() != null && !d.getExecutePhase().isEmpty())
+                || (d.getExecuteGoal() != null && !d.getExecuteGoal().isEmpty());
+    }
 }

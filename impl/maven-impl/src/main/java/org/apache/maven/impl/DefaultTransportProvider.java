@@ -23,9 +23,14 @@ import java.net.URISyntaxException;
 
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.cache.CacheMetadata;
+import org.apache.maven.api.cache.CacheRetention;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.services.Request;
+import org.apache.maven.api.services.RequestTrace;
+import org.apache.maven.api.services.Result;
 import org.apache.maven.api.services.Transport;
 import org.apache.maven.api.services.TransportProvider;
 import org.apache.maven.api.services.TransportProviderException;
@@ -57,6 +62,31 @@ public class DefaultTransportProvider implements TransportProvider {
             throw new TransportProviderException("Remote repository URL invalid", e);
         } catch (NoTransporterException e) {
             throw new TransportProviderException("Unsupported remote repository", e);
+        }
+    }
+
+    private record TransportRequest(Session session, RemoteRepository repository)
+            implements Request<Session>, CacheMetadata {
+        @Override
+        public Session session() {
+            return session;
+        }
+
+        @Override
+        public RequestTrace trace() {
+            return null;
+        }
+
+        @Override
+        public CacheRetention getCacheRetention() {
+            return CacheRetention.DISABLED;
+        }
+    }
+
+    private record TransportResult(TransportRequest request, Transport transport) implements Result<TransportRequest> {
+        @Override
+        public TransportRequest getRequest() {
+            return request;
         }
     }
 }

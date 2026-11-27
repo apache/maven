@@ -39,27 +39,52 @@ public class DefaultEvent implements Event {
     }
 
     @Override
-    public EventType getType() {
+    public EventType type() {
         return eventType;
     }
 
     @Override
-    public Session getSession() {
+    public EventType getType() {
+        return type();
+    }
+
+    @Override
+    public Session session() {
         return session;
     }
 
     @Override
-    public Optional<Project> getProject() {
+    public Session getSession() {
+        return session();
+    }
+
+    @Override
+    public Optional<Project> project() {
         return Optional.ofNullable(session.getProject(delegate.getProject()));
     }
 
     @Override
-    public Optional<MojoExecution> getMojoExecution() {
+    public Optional<Project> getProject() {
+        return project();
+    }
+
+    @Override
+    public Optional<MojoExecution> mojoExecution() {
         return Optional.ofNullable(delegate.getMojoExecution()).map(me -> new DefaultMojoExecution(session, me));
     }
 
     @Override
-    public Optional<Exception> getException() {
+    public Optional<MojoExecution> getMojoExecution() {
+        return mojoExecution();
+    }
+
+    @Override
+    public Optional<Exception> exception() {
         return Optional.ofNullable(delegate.getException());
+    }
+
+    @Override
+    public Optional<Exception> getException() {
+        return exception();
     }
 }

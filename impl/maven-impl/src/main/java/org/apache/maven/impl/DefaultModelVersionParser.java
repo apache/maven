@@ -159,12 +159,12 @@ public class DefaultModelVersionParser implements ModelVersionParser {
             }
             return new Boundary() {
                 @Override
-                public Version getVersion() {
+                public Version version() {
                     return new DefaultVersion(versionScheme, bound.getVersion());
                 }
 
                 @Override
-                public boolean isInclusive() {
+                public boolean inclusive() {
                     return bound.isInclusive();
                 }
             };
@@ -178,12 +178,12 @@ public class DefaultModelVersionParser implements ModelVersionParser {
             }
             return new Boundary() {
                 @Override
-                public Version getVersion() {
+                public Version version() {
                     return new DefaultVersion(versionScheme, bound.getVersion());
                 }
 
                 @Override
-                public boolean isInclusive() {
+                public boolean inclusive() {
                     return bound.isInclusive();
                 }
             };

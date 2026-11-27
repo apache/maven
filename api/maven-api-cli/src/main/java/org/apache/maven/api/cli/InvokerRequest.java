@@ -206,6 +206,6 @@ public interface InvokerRequest {
      */
     default boolean effectiveVerbose() {
         return options().isPresent() && options().orElseThrow().verbose().orElse(false)
-                || ciInfo().isPresent() && ciInfo().orElseThrow().isVerbose();
+                || ciInfo().isPresent() && ciInfo().orElseThrow().verbose();
     }
 }

@@ -71,7 +71,7 @@ public class DefaultVersionResolver implements VersionResolver {
 
             return new VersionResolverResult() {
                 @Override
-                public VersionResolverRequest getRequest() {
+                public VersionResolverRequest request() {
                     return request;
                 }
 

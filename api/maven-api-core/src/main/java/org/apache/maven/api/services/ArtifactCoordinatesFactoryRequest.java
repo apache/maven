@@ -38,19 +38,68 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
 
-    String getGroupId();
+    /** Returns the group identifier. */
+    String groupId();
 
-    String getArtifactId();
+    /** @deprecated Use {@link #groupId()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getGroupId() {
+        return groupId();
+    }
 
-    String getVersion();
+    /** Returns the artifact identifier. */
+    String artifactId();
 
-    String getClassifier();
+    /** @deprecated Use {@link #artifactId()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getArtifactId() {
+        return artifactId();
+    }
 
-    String getExtension();
+    /** Returns the version. */
+    String version();
 
-    String getType();
+    /** @deprecated Use {@link #version()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getVersion() {
+        return version();
+    }
 
-    String getCoordinatesString();
+    /** Returns the classifier, may be {@code null}. */
+    String classifier();
+
+    /** @deprecated Use {@link #classifier()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getClassifier() {
+        return classifier();
+    }
+
+    /** Returns the file extension, may be {@code null}. */
+    String extension();
+
+    /** @deprecated Use {@link #extension()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getExtension() {
+        return extension();
+    }
+
+    /** Returns the artifact type, may be {@code null}. */
+    String type();
+
+    /** @deprecated Use {@link #type()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getType() {
+        return type();
+    }
+
+    /** Returns the coordinate string in the format {@code groupId:artifactId[:extension[:classifier]]:version}, may be {@code null}. */
+    String coordinatesString();
+
+    /** @deprecated Use {@link #coordinatesString()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getCoordinatesString() {
+        return coordinatesString();
+    }
 
     @Nonnull
     static ArtifactCoordinatesFactoryRequest build(
@@ -104,12 +153,14 @@ public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
                 .build();
     }
 
-    static ArtifactFactoryRequestBuilder builder() {
-        return new ArtifactFactoryRequestBuilder();
+    /** Returns a new builder instance. */
+    @Deprecated
+    static ArtifactCoordinatesFactoryRequestBuilder builder() {
+        return new ArtifactCoordinatesFactoryRequestBuilder();
     }
 
     @NotThreadSafe
-    class ArtifactFactoryRequestBuilder {
+    class ArtifactCoordinatesFactoryRequestBuilder {
         private Session session;
         private RequestTrace trace;
         private String groupId;
@@ -120,49 +171,49 @@ public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
         private String type;
         private String coordinateString;
 
-        ArtifactFactoryRequestBuilder() {}
+        ArtifactCoordinatesFactoryRequestBuilder() {}
 
-        public ArtifactFactoryRequestBuilder session(Session session) {
+        public ArtifactCoordinatesFactoryRequestBuilder session(Session session) {
             this.session = session;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder trace(RequestTrace trace) {
+        public ArtifactCoordinatesFactoryRequestBuilder trace(RequestTrace trace) {
             this.trace = trace;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder groupId(String groupId) {
+        public ArtifactCoordinatesFactoryRequestBuilder groupId(String groupId) {
             this.groupId = groupId;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder artifactId(String artifactId) {
+        public ArtifactCoordinatesFactoryRequestBuilder artifactId(String artifactId) {
             this.artifactId = artifactId;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder version(String version) {
+        public ArtifactCoordinatesFactoryRequestBuilder version(String version) {
             this.version = version;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder classifier(String classifier) {
+        public ArtifactCoordinatesFactoryRequestBuilder classifier(String classifier) {
             this.classifier = classifier;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder extension(String extension) {
+        public ArtifactCoordinatesFactoryRequestBuilder extension(String extension) {
             this.extension = extension;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder type(String type) {
+        public ArtifactCoordinatesFactoryRequestBuilder type(String type) {
             this.type = type;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder coordinateString(String coordinateString) {
+        public ArtifactCoordinatesFactoryRequestBuilder coordinateString(String coordinateString) {
             this.coordinateString = coordinateString;
             return this;
         }
@@ -204,37 +255,37 @@ public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
             }
 
             @Override
-            public String getGroupId() {
+            public String groupId() {
                 return groupId;
             }
 
             @Override
-            public String getArtifactId() {
+            public String artifactId() {
                 return artifactId;
             }
 
             @Override
-            public String getVersion() {
+            public String version() {
                 return version;
             }
 
             @Override
-            public String getClassifier() {
+            public String classifier() {
                 return classifier;
             }
 
             @Override
-            public String getExtension() {
+            public String extension() {
                 return extension;
             }
 
             @Override
-            public String getType() {
+            public String type() {
                 return type;
             }
 
             @Override
-            public String getCoordinatesString() {
+            public String coordinatesString() {
                 return coordinatesString;
             }
 

@@ -54,27 +54,47 @@ public class DefaultNode extends AbstractNode {
     }
 
     @Override
-    public Artifact getArtifact() {
+    public Artifact artifact() {
         return node.getArtifact() != null ? session.getArtifact(node.getArtifact()) : null;
     }
 
     @Override
-    public Dependency getDependency() {
+    public Artifact getArtifact() {
+        return artifact();
+    }
+
+    @Override
+    public Dependency dependency() {
         return node.getDependency() != null ? session.getDependency(node.getDependency()) : null;
     }
 
     @Override
-    public List<Node> getChildren() {
+    public Dependency getDependency() {
+        return dependency();
+    }
+
+    @Override
+    public List<Node> children() {
         return new MappedList<>(node.getChildren(), n -> session.getNode(n, verbose));
     }
 
     @Override
-    public List<RemoteRepository> getRemoteRepositories() {
+    public List<Node> getChildren() {
+        return children();
+    }
+
+    @Override
+    public List<RemoteRepository> remoteRepositories() {
         return new MappedList<>(node.getRepositories(), session::getRemoteRepository);
     }
 
     @Override
-    public Optional<RemoteRepository> getRepository() {
+    public List<RemoteRepository> getRemoteRepositories() {
+        return remoteRepositories();
+    }
+
+    @Override
+    public Optional<RemoteRepository> repository() {
         if (cachedRepository == null) {
             org.eclipse.aether.artifact.Artifact artifact = node.getArtifact();
             List<org.eclipse.aether.repository.RemoteRepository> repos = node.getRepositories();
@@ -90,6 +110,11 @@ public class DefaultNode extends AbstractNode {
             }
         }
         return cachedRepository;
+    }
+
+    @Override
+    public Optional<RemoteRepository> getRepository() {
+        return repository();
     }
 
     /**
