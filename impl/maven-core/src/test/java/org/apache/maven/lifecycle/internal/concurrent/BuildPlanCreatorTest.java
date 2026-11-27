@@ -661,4 +661,45 @@ class BuildPlanCreatorTest {
         });
     }
      */
+
+    /**
+     * Regression test for <a href="https://github.com/apache/maven/issues/14151">#14151</a>:
+     * with the concurrent builder, goals bound to the {@code verify} phase (e.g.
+     * {@code failsafe:verify}, {@code jacoco:check}) must not run before compilation,
+     * tests and packaging complete.
+     *
+     * <p>Root cause: the {@code VERIFY} container phase only declared {@code after(VALIDATE)},
+     * so its {@code before:verify} build step had no ordering edge to {@code after:build}.
+     * The fix adds {@code after(BUILD)} to the {@code VERIFY} phase definition, ensuring
+     * {@code before:verify executeAfter after:build} in the DAG.</p>
+     */
+    @Test
+    void testVerifyPhaseWaitsForBuild() {
+        MavenProject project = new MavenProject();
+        project.setCollectedProjects(List.of());
+        Map<MavenProject, List<MavenProject>> projects = Collections.singletonMap(project, Collections.emptyList());
+
+        BuildPlan plan = calculateLifecycleMappings(projects, "verify");
+
+        // before:verify must transitively depend on after:build (and therefore after:package).
+        // We verify this by checking that after:build is reachable in the predecessor graph
+        // of before:verify — i.e. before:verify cannot be scheduled before build completes.
+        BuildStep beforeVerify = plan.requiredStep(project, "before:verify");
+        boolean afterBuildIsPrerequisite = beforeVerify
+                .allPredecessors()
+                .anyMatch(step -> step.project == project && "after:build".equals(step.name));
+
+        assertTrue(
+                afterBuildIsPrerequisite,
+                "before:verify must transitively depend on after:build so that mojos bound to "
+                        + "'verify' (e.g. failsafe:verify, jacoco:check) cannot run before "
+                        + "compilation, test and packaging complete (#14151)");
+
+        // Symmetrically, after:package (a child of build) must also be a transitive prerequisite.
+        boolean afterPackageIsPrerequisite = beforeVerify
+                .allPredecessors()
+                .anyMatch(step -> step.project == project && "after:package".equals(step.name));
+
+        assertTrue(afterPackageIsPrerequisite, "before:verify must transitively depend on after:package (#14151)");
+    }
 }
