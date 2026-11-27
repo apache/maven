@@ -118,6 +118,22 @@ public class PathSelectorTest {
     }
 
     /**
+     * Tests that an exclude given as a directory with a trailing slash is not omitted as unnecessary.
+     *
+     * @param directory temporary directory where to create a tree
+     * @throws IOException if an error occurred while creating a temporary file or directory
+     */
+    @Test
+    public void testExcludeDirectoryWithTrailingSlash(final @TempDir Path directory) throws IOException {
+        Path docs = Files.createDirectory(directory.resolve("docs"));
+        Files.createFile(directory.resolve("README.md"));
+        Files.createFile(docs.resolve("guide.md"));
+        PathMatcher matcher = PathSelector.of(directory, List.of("**/*.md"), List.of("docs/"), false);
+        assertTrue(matcher.matches(directory.resolve("README.md")));
+        assertFalse(matcher.matches(docs.resolve("guide.md")));
+    }
+
+    /**
      * Tests the omission of unnecessary excludes.
      *
      * Note: at the time of writing this test (April 2025), the list of excludes goes down from 40 to 17 elements.
