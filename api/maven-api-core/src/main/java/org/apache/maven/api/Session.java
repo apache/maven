@@ -37,6 +37,7 @@ import org.apache.maven.api.services.LifecycleExecutionResult;
 import org.apache.maven.api.services.LifecycleExecutor;
 import org.apache.maven.api.services.LifecyclePlanResult;
 import org.apache.maven.api.services.RequestTrace;
+import org.apache.maven.api.services.VersionRangeResolverException;
 import org.apache.maven.api.services.VersionResolverException;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.api.toolchain.ToolchainModel;
@@ -837,7 +838,7 @@ public interface Session extends ProtoSession {
      * @see org.apache.maven.api.services.VersionRangeResolver#resolve(Session, ArtifactCoordinates) (String)
      */
     @Nonnull
-    List<Version> resolveVersionRange(@Nonnull ArtifactCoordinates artifact) throws VersionResolverException;
+    List<Version> resolveVersionRange(@Nonnull ArtifactCoordinates artifact) throws VersionRangeResolverException;
 
     /**
      * Expands a version range to a list of matching versions, in ascending order.
@@ -855,7 +856,7 @@ public interface Session extends ProtoSession {
      */
     @Nonnull
     List<Version> resolveVersionRange(@Nonnull ArtifactCoordinates artifact, List<RemoteRepository> repositories)
-            throws VersionResolverException;
+            throws VersionRangeResolverException;
 
     /**
      * Resolves the highest available version of a version range.
@@ -872,7 +873,7 @@ public interface Session extends ProtoSession {
      */
     @Nonnull
     Optional<Version> resolveHighestVersion(@Nonnull ArtifactCoordinates artifact, List<RemoteRepository> repositories)
-            throws VersionResolverException;
+            throws VersionRangeResolverException;
 
     /**
      * Parses the specified version string, for example "1.0".

@@ -167,7 +167,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
             assertNotNull(verifier);
             final List<String> lines = verifier.loadFile(testDir.resolve("log.txt"));
             int msg =
-                    indexOf(lines, ".*Non-resolvable parent POM org.apache.maven.its.mng2199:local-parent:\\[2,3\\].*");
+                    indexOf(lines, ".*Non-resolvable parent POM.*org.apache.maven.its.mng2199:local-parent:\\[2,3\\].*");
             assertTrue(msg >= 0, "Expected error message not found.");
         }
     }
