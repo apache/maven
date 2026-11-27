@@ -210,10 +210,11 @@ public class ConditionParser {
         Object left = parseLogicalAnd();
         while (current < tokens.size() && tokens.get(current).equals("||")) {
             current++;
-            if ((boolean) left) {
+            if (toBoolean(left)) {
                 skipOperand(Set.of("||", ",", ")"));
+                left = true;
             } else {
-                left = (boolean) parseLogicalAnd();
+                left = toBoolean(parseLogicalAnd());
             }
         }
         return left;
@@ -229,10 +230,11 @@ public class ConditionParser {
         Object left = parseComparison();
         while (current < tokens.size() && tokens.get(current).equals("&&")) {
             current++;
-            if ((boolean) left) {
-                left = (boolean) parseComparison();
+            if (toBoolean(left)) {
+                left = toBoolean(parseComparison());
             } else {
                 skipOperand(Set.of("&&", "||", ",", ")"));
+                left = false;
             }
         }
         return left;
