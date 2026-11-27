@@ -122,17 +122,29 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
 
         List<ArtifactRepository> artifactRepositories = new ArrayList<>();
         Collection<String> repoIds = new HashSet<>();
+        Collection<String> mirroredRepoIds = new HashSet<>();
 
         if (dominantRepositories != null) {
             for (ArtifactRepository repository : dominantRepositories) {
                 repoIds.add(repository.getId());
+                if (!repository.getMirroredRepositories().isEmpty()) {
+                    mirroredRepoIds.add(repository.getId());
+                }
                 artifactRepositories.add(repository);
             }
         }
 
         if (recessiveRepositories != null) {
             for (ArtifactRepository repository : recessiveRepositories) {
-                if (repoIds.add(repository.getId())) {
+                // A plain id collision (e.g. two repositories literally declared with id "central")
+                // keeps the existing dominant-wins behavior. But when a single mirror maps both
+                // sides to the same id (e.g. mirrorOf=*), both are mirror results rather than a
+                // real collision, and dropping either one loses its release/snapshot policy.
+                // Keep both so getEffectiveRepositories() below can merge their policies, the same
+                // way it already does when both mirrored copies come from the dominant side.
+                if (repoIds.add(repository.getId())
+                        || (mirroredRepoIds.contains(repository.getId())
+                                && !repository.getMirroredRepositories().isEmpty())) {
                     artifactRepositories.add(repository);
                 }
             }
