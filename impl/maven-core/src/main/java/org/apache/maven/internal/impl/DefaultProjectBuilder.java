@@ -72,17 +72,13 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     public ProjectBuilderResult build(ProjectBuilderRequest request)
             throws ProjectBuilderException, IllegalArgumentException {
         InternalSession session = InternalSession.from(request.getSession());
-        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
-        try {
-            return session.request(request, this::doBuild);
-        } finally {
-            RequestTraceHelper.exit(trace);
-        }
+        return session.request(request, this::doBuild);
     }
 
     protected ProjectBuilderResult doBuild(ProjectBuilderRequest request)
             throws ProjectBuilderException, IllegalArgumentException {
         InternalMavenSession session = InternalMavenSession.from(request.getSession());
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
         try {
             List<ArtifactRepository> repositories = session.toArtifactRepositories(
                     request.getRepositories() != null ? request.getRepositories() : session.getRemoteRepositories());
@@ -201,6 +197,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             };
         } catch (ProjectBuildingException e) {
             throw new ProjectBuilderException("Unable to build project", e);
+        } finally {
+            RequestTraceHelper.exit(trace);
         }
     }
 

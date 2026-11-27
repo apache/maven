@@ -58,23 +58,13 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
             throws VersionRangeResolverException {
         requireNonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
-        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
-        try {
-            return session.request(request, this::doResolve);
-        } finally {
-            RequestTraceHelper.exit(trace);
-        }
+        return session.request(request, this::doResolve);
     }
 
     public VersionRangeResolverResult doResolve(VersionRangeResolverRequest request)
             throws VersionRangeResolverException {
         InternalSession session = InternalSession.from(request.getSession());
-        org.apache.maven.api.services.RequestTrace trace = RequestTraceHelper.getCurrentTrace(session);
-        RequestTraceHelper.ResolverTrace fallbackTrace = null;
-        if (trace == null) {
-            fallbackTrace = RequestTraceHelper.enter(session, request);
-            trace = fallbackTrace.mvnTrace();
-        }
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
         try {
             VersionRangeResult res = repositorySystem.resolveVersionRange(
                     session.getSession(),
@@ -86,7 +76,7 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
                                                     : session.getRemoteRepositories()),
                                     toResolver(request.getNature()),
                                     trace.context())
-                            .setTrace(RequestTraceHelper.toResolver(trace)));
+                            .setTrace(trace.trace()));
 
             Map<String, ArtifactRepository> repos = res.getVersions().stream()
                     .filter(v -> res.getRepository(v) != null)
@@ -123,9 +113,7 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
         } catch (VersionRangeResolutionException e) {
             throw new VersionRangeResolverException("Unable to resolve version range", e);
         } finally {
-            if (fallbackTrace != null) {
-                RequestTraceHelper.exit(fallbackTrace);
-            }
+            RequestTraceHelper.exit(trace);
         }
     }
 
