@@ -308,6 +308,39 @@ class BuildPlanExecutorTest {
         assertTrue(session.getResult().getBuildSummary(project) instanceof org.apache.maven.execution.BuildFailure);
     }
 
+    @Test
+    void aggregatorGoalInvokedAloneInMultiModuleBuild() throws Exception {
+        String goal = "test:example-plugin:1:run";
+        MavenProject root = newProject();
+        MavenProject module = newProject();
+        module.setArtifactId("b");
+        MavenSession session = newSession(root);
+        session.setProjectDependencyGraph(new SingleProjectDependencyGraph(root, module));
+        session.setProjects(List.of(root, module));
+        session.getRequest().setGoals(List.of(goal));
+
+        PluginDescriptor plugin = new PluginDescriptor();
+        plugin.setPlugin(new Plugin());
+        MojoDescriptor descriptor = new MojoDescriptor();
+        descriptor.setGoal("run");
+        descriptor.setAggregator(true);
+        descriptor.setPluginDescriptor(plugin);
+        descriptor.setMojoConfiguration(new XmlPlexusConfiguration("configuration"));
+        MojoDescriptorCreator descriptors = mock(MojoDescriptorCreator.class);
+        when(descriptors.getMojoDescriptor(goal, session, root)).thenReturn(descriptor);
+        MojoExecutor mojoExecutor = mock(MojoExecutor.class);
+
+        TaskSegment segment = new TaskSegment(true);
+        segment.getTasks().add(new GoalTask(goal));
+        try (BuildPlanExecutor.BuildContext context = newDirectGoalExecutor(mojoExecutor, descriptors)
+        .new BuildContext(session, newReactorContext(session), List.of(segment))) {
+            context.execute();
+        }
+
+        verify(mojoExecutor).execute(same(session), anyList());
+        assertEquals(List.of(), session.getResult().getExceptions());
+    }
+
     private BuildPlanExecutor newDirectGoalExecutor(MojoExecutor mojoExecutor, MojoDescriptorCreator descriptors) {
         return new BuildPlanExecutor(
                 mojoExecutor,
@@ -578,8 +611,8 @@ class BuildPlanExecutorTest {
 
         private final List<MavenProject> projects;
 
-        private SingleProjectDependencyGraph(MavenProject project) {
-            this.projects = List.of(project);
+        private SingleProjectDependencyGraph(MavenProject... projects) {
+            this.projects = List.of(projects);
         }
 
         @Override
