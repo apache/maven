@@ -68,7 +68,7 @@ public class BuildPlan {
     }
 
     public void addStep(MavenProject project, String name, BuildStep step) {
-        // an aggregating segment only plans the top level project
+        // an aggregating segment only plans the top-level project; create the entry lazily for other projects
         plan.computeIfAbsent(project, p -> new HashMap<>()).put(name, step);
         invalidateOrdering();
     }
